@@ -34,7 +34,8 @@ fruits = [
     ("Melone", "Sommer"),
     ("Birne", "Herbst"),
     ("Pflaume", "Sommer"),
-    ("Zitrone", "Winter")
+    ("Zitrone", "Winter"),
+    ("Aprikose", "Sommer")
 ]
 
 # Funktion, um neue Frucht zu erzeugen
