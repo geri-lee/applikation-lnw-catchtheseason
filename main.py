@@ -5,7 +5,7 @@ WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Season Drop – Fange die Früchte!")
 
-font = pygame.font.SysFont("Arial", 30)
+font = pygame.font.SysFont("Arial", 30, bold=True)
 clock = pygame.time.Clock()
 
 # Farben
@@ -17,12 +17,21 @@ SKY = (120, 180, 255)
 seasons = ["Frühling", "Sommer", "Herbst", "Winter"]
 basket_width, basket_height = 150, 50
 baskets = []
+
+# Positionen der vier Körbe berechnen
 for i in range(4):
     x = i * (WIDTH // 4) + (WIDTH // 8) - basket_width // 2
     baskets.append(pygame.Rect(x, HEIGHT - basket_height - 10, basket_width, basket_height))
 
-# Farben der Körbe
-basket_colors = [(140, 230, 140), (255, 230, 100), (255, 180, 100), (200, 200, 255)]
+# 🧺 Fruchtkorb-Bild laden (gleich für alle Saisons)
+try:
+    basket_img = pygame.image.load("bilder/korb.webp")  # dein Bildname
+    basket_img = pygame.transform.scale(basket_img, (basket_width, basket_height + 30))
+except:
+    # Falls das Bild fehlt → grauer Ersatzkorb
+    basket_img = pygame.Surface((basket_width, basket_height))
+    basket_img.fill((200, 200, 200))
+
 
 # Früchte & zugehörige Saisons
 fruits = [
@@ -52,6 +61,13 @@ fall_speed = 3
 move_speed = 6
 game_over = False
 
+
+# Reset-Button
+button_width, button_height = 200, 50
+button_x = WIDTH // 2 - button_width // 2
+button_y = HEIGHT // 2 + 40
+reset_button = pygame.Rect(button_x, button_y, button_width, button_height)
+
 # Hauptschleife
 running = True
 while running:
@@ -61,6 +77,13 @@ while running:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN and game_over:
+            if reset_button.collidepoint(event.pos):
+                # Reset der Startwerte
+                score = 0
+                fall_speed = 3
+                fruit = new_fruit()
+                game_over = False
 
     keys = pygame.key.get_pressed()
     if not game_over:
@@ -90,9 +113,10 @@ while running:
 
     # Körbe zeichnen
     for i, basket in enumerate(baskets):
-        pygame.draw.rect(screen, basket_colors[i], basket)
-        label = font.render(seasons[i], True, BLACK)
-        screen.blit(label, (basket.x + 15, basket.y + 10))
+        screen.blit(basket_img, (basket.x, basket.y - 10))
+        label = font.render(seasons[i], True, WHITE)
+        label_rect = label.get_rect(center=(basket.x + basket_width // 2, basket.y + 30))
+        screen.blit(label, label_rect)
 
     # Frucht zeichnen
     pygame.draw.ellipse(screen, (255, 100, 100), fruit["rect"])
@@ -107,6 +131,16 @@ while running:
     if game_over:
         over_label = font.render("Falsche Frucht! Spiel vorbei!", True, (255, 0, 0))
         screen.blit(over_label, (WIDTH // 2 - 200, HEIGHT // 2 - 20))
+
+    if game_over:
+        over_label = font.render("Falsche Frucht! Spiel vorbei!", True, (255, 0, 0))
+        screen.blit(over_label, (WIDTH // 2 - 200, HEIGHT // 2 - 20))
+
+        # Button zeichnen
+        pygame.draw.rect(screen, (100, 200, 255), reset_button)
+        btn_label = font.render("Neu starten", True, BLACK)
+        btn_rect = btn_label.get_rect(center=reset_button.center)
+        screen.blit(btn_label, btn_rect)
 
     pygame.display.flip()
     clock.tick(60)
