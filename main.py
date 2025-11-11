@@ -33,19 +33,48 @@ except:
     basket_img.fill((200, 200, 200))
 
 
+
 # Früchte & zugehörige Saisons
 fruits = [
-    ("Apfel", "Herbst"),
+    ("Rhabarber", "Frühling"),
+    ("Bärlauch", "Frühling"),
+    ("Brennnessel", "Frühling"),
+    ("Spargel", "Frühling"),
     ("Erdbeere", "Sommer"),
-    ("Kürbis", "Herbst"),
-    ("Orange", "Winter"),
-    ("Kirsche", "Frühling"),
-    ("Melone", "Sommer"),
-    ("Birne", "Herbst"),
+    ("Zuchetti", "Sommer"),
     ("Pflaume", "Sommer"),
+    ("Aprikose", "Sommer"),
+    ("Gurke", "Sommer"),
+    ("Apfel", "Herbst"),
+    ("Kürbis", "Herbst"),
+    ("Birne", "Herbst"),
+    ("Süsskartoffel", "Herbst"),
+    ("Ingwer", "Herbst"),
+    ("Orange", "Winter"),
     ("Zitrone", "Winter"),
-    ("Aprikose", "Sommer")
+    ("Federkohl", "Winter"),
+    ("Rosenkohl", "Winter")
+
 ]
+
+def safe_filename(name):
+    return (name.lower()
+                 .replace("ä", "ae")
+                 .replace("ö", "oe")
+                 .replace("ü", "ue"))
+
+# Frucht-Bild laden
+fruit_images = {}
+for name, _ in fruits:
+    path = f"bilder/{safe_filename(name)}.png"
+    try:
+        img = pygame.image.load(path).convert_alpha()
+        img = pygame.transform.scale(img, (80, 80))
+    except:
+        img = pygame.Surface((50, 50), pygame.SRCALPHA)
+        pygame.draw.ellipse(img, (255, 100, 100), img.get_rect())
+    fruit_images[name] = img
+
 
 # Funktion, um neue Frucht zu erzeugen
 def new_fruit():
@@ -81,7 +110,7 @@ while running:
             if reset_button.collidepoint(event.pos):
                 # Reset der Startwerte
                 score = 0
-                fall_speed = 3
+                fall_speed = 2
                 fruit = new_fruit()
                 game_over = False
 
@@ -102,7 +131,7 @@ while running:
             if basket.colliderect(fruit["rect"]):
                 if fruit["season"] == seasons[i]:
                     score += 1
-                    fall_speed += 0.2  # Schwierigkeit erhöhen
+                    fall_speed += 0.1  # Schwierigkeit erhöhen
                     fruit = new_fruit()
                 else:
                     game_over = True
@@ -119,9 +148,9 @@ while running:
         screen.blit(label, label_rect)
 
     # Frucht zeichnen
-    pygame.draw.ellipse(screen, (255, 100, 100), fruit["rect"])
-    name_label = font.render(fruit["name"][:10], True, BLACK)
-    screen.blit(name_label, (fruit["rect"].x - 10, fruit["rect"].y - 30))
+    screen.blit(fruit_images[fruit["name"]], fruit["rect"])
+    #name_label = font.render(fruit["name"][:15], True, BLACK)
+    #screen.blit(name_label, (fruit["rect"].x - 10, fruit["rect"].y - 30))
 
     # Punkteanzeige
     score_label = font.render(f"Punkte: {score}", True, BLACK)
