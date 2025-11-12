@@ -3,7 +3,7 @@ import pygame, random, sys
 pygame.init()
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Season Drop – Fange die Früchte!")
+pygame.display.set_caption("Season Drop – Ordne die Früchte zu!")
 
 font = pygame.font.SysFont("Arial", 30, bold=True)
 clock = pygame.time.Clock()
@@ -12,6 +12,13 @@ clock = pygame.time.Clock()
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 SKY = (120, 180, 255)
+
+# Hintergrundbild laden
+try:
+    background_img = pygame.image.load("bilder/hintergrund.jpg").convert()
+    background_img = pygame.transform.scale(background_img, (WIDTH, HEIGHT))
+except:
+    background_img = None
 
 # Körbe (vier Saisons)
 seasons = ["Frühling", "Sommer", "Herbst", "Winter"]
@@ -99,13 +106,30 @@ reset_button = pygame.Rect(button_x, button_y, button_width, button_height)
 
 # Hauptschleife
 running = True
+game_started = False  # neuer Zustand
+start_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 - 25, 200, 50)
+
 while running:
-    screen.fill(SKY)
+    if background_img:
+        screen.blit(background_img, (0, 0))
+    else:
+        screen.fill(SKY)  # falls Bild fehlt
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        # Wenn Spiel noch nicht gestartet ist
+        if not game_started:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if start_button.collidepoint(event.pos):
+                    game_started = True
+                    game_over = False
+                    score = 0
+                    fall_speed = 3
+                    fruit = new_fruit()
+                    fruit["rect"].y = 0
+
         if event.type == pygame.MOUSEBUTTONDOWN and game_over:
             if reset_button.collidepoint(event.pos):
                 # Reset der Startwerte
@@ -115,7 +139,7 @@ while running:
                 game_over = False
 
     keys = pygame.key.get_pressed()
-    if not game_over:
+    if game_started and not game_over:
         # Frucht bewegen
         if keys[pygame.K_LEFT]:
             fruit["rect"].x -= move_speed
@@ -148,13 +172,25 @@ while running:
         screen.blit(label, label_rect)
 
     # Frucht zeichnen
-    screen.blit(fruit_images[fruit["name"]], fruit["rect"])
+    if game_started and not game_over:
+        screen.blit(fruit_images[fruit["name"]], fruit["rect"])
     #name_label = font.render(fruit["name"][:15], True, BLACK)
     #screen.blit(name_label, (fruit["rect"].x - 10, fruit["rect"].y - 30))
 
     # Punkteanzeige
     score_label = font.render(f"Punkte: {score}", True, BLACK)
     screen.blit(score_label, (10, 10))
+
+    # Startbildschirm
+    if not game_started:
+        title = font.render("Season Drop – Ordne die Früchte zu!", True, BLACK)
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 2 - 100))
+        pygame.draw.rect(screen, (100, 255, 100), start_button)
+        start_text = font.render("Start", True, BLACK)
+        screen.blit(start_text, (WIDTH // 2 - start_text.get_width() // 2, HEIGHT // 2 - 10))
+        pygame.display.flip()
+        clock.tick(60)
+        continue
 
     # Game Over
     if game_over:
