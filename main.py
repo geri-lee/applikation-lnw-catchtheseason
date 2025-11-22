@@ -88,7 +88,7 @@ def new_fruit():
     name, season = random.choice(fruits)
     x = random.randint(50, WIDTH - 50)
     y = -40
-    return {"name": name, "season": season, "rect": pygame.Rect(x, y, 40, 40)}
+    return {"name": name, "season": season, "rect": pygame.Rect(x, y, 65, 65)}
 
 # Startwerte
 fruit = new_fruit()
@@ -187,19 +187,15 @@ while running:
         screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 2 - 100))
         pygame.draw.rect(screen, (100, 255, 100), start_button)
         start_text = font.render("Start", True, BLACK)
-        screen.blit(start_text, (WIDTH // 2 - start_text.get_width() // 2, HEIGHT // 2 - 10))
+        screen.blit(start_text, (WIDTH // 2 - start_text.get_width() // 2, HEIGHT // 2 - 18))
         pygame.display.flip()
         clock.tick(60)
         continue
 
     # Game Over
     if game_over:
-        over_label = font.render("Falsche Frucht! Spiel vorbei!", True, (255, 0, 0))
-        screen.blit(over_label, (WIDTH // 2 - 200, HEIGHT // 2 - 20))
-
-    if game_over:
-        over_label = font.render("Falsche Frucht! Spiel vorbei!", True, (255, 0, 0))
-        screen.blit(over_label, (WIDTH // 2 - 200, HEIGHT // 2 - 20))
+        over_label = font.render("Falsche Saison! Spiel vorbei!", True, (255, 0, 0))
+        screen.blit(over_label, (WIDTH // 2 - 170, HEIGHT // 2 - 20))
 
         # Button zeichnen
         pygame.draw.rect(screen, (100, 200, 255), reset_button)
