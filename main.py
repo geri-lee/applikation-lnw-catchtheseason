@@ -5,13 +5,13 @@ WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Season Drop – Ordne die Früchte zu!")
 
-font = pygame.font.SysFont("Arial", 30, bold=True)
+font = pygame.font.SysFont("Century Gothic", 28, bold=True)
 clock = pygame.time.Clock()
 
 # Farben
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-SKY = (120, 180, 255)
+SKY = (173, 216, 230)
 
 # Hintergrundbild laden
 try:
@@ -19,8 +19,9 @@ try:
     background_img = pygame.transform.scale(background_img, (WIDTH, HEIGHT))
 except:
     background_img = None
+    screen.fill(SKY)
 
-# Körbe (vier Saisons)
+# Körbe
 seasons = ["Frühling", "Sommer", "Herbst", "Winter"]
 basket_width, basket_height = 150, 50
 baskets = []
@@ -30,7 +31,7 @@ for i in range(4):
     x = i * (WIDTH // 4) + (WIDTH // 8) - basket_width // 2
     baskets.append(pygame.Rect(x, HEIGHT - basket_height - 10, basket_width, basket_height))
 
-# 🧺 Fruchtkorb-Bild laden (gleich für alle Saisons)
+# Fruchtkorb-Bild laden
 try:
     basket_img = pygame.image.load("bilder/korb.webp")  # dein Bildname
     basket_img = pygame.transform.scale(basket_img, (basket_width, basket_height + 30))
@@ -38,7 +39,6 @@ except:
     # Falls das Bild fehlt → grauer Ersatzkorb
     basket_img = pygame.Surface((basket_width, basket_height))
     basket_img.fill((200, 200, 200))
-
 
 
 # Früchte & zugehörige Saisons
@@ -64,6 +64,7 @@ fruits = [
 
 ]
 
+#Umlaute anpassen
 def safe_filename(name):
     return (name.lower()
                  .replace("ä", "ae")
@@ -76,7 +77,7 @@ for name, _ in fruits:
     path = f"bilder/{safe_filename(name)}.png"
     try:
         img = pygame.image.load(path).convert_alpha()
-        img = pygame.transform.scale(img, (80, 80))
+        img = pygame.transform.scale(img, (100, 100))
     except:
         img = pygame.Surface((50, 50), pygame.SRCALPHA)
         pygame.draw.ellipse(img, (255, 100, 100), img.get_rect())
@@ -93,7 +94,7 @@ def new_fruit():
 # Startwerte
 fruit = new_fruit()
 score = 0
-fall_speed = 3
+fall_speed = 2
 move_speed = 6
 game_over = False
 
@@ -106,14 +107,14 @@ reset_button = pygame.Rect(button_x, button_y, button_width, button_height)
 
 # Hauptschleife
 running = True
-game_started = False  # neuer Zustand
+game_started = False
 start_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 - 25, 200, 50)
 
 while running:
     if background_img:
         screen.blit(background_img, (0, 0))
     else:
-        screen.fill(SKY)  # falls Bild fehlt
+        screen.fill(SKY)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -126,7 +127,7 @@ while running:
                     game_started = True
                     game_over = False
                     score = 0
-                    fall_speed = 3
+                    fall_speed = 2
                     fruit = new_fruit()
                     fruit["rect"].y = 0
 
@@ -138,14 +139,18 @@ while running:
                 fruit = new_fruit()
                 game_over = False
 
+    # Frucht bewegen
     keys = pygame.key.get_pressed()
     if game_started and not game_over:
-        # Frucht bewegen
         if keys[pygame.K_LEFT]:
             fruit["rect"].x -= move_speed
         if keys[pygame.K_RIGHT]:
             fruit["rect"].x += move_speed
+        if keys[pygame.K_DOWN]:
+            fruit["rect"].y += move_speed
         fruit["rect"].y += fall_speed
+
+
 
         # Begrenzung des Spielfelds
         fruit["rect"].x = max(0, min(fruit["rect"].x, WIDTH - fruit["rect"].width))
@@ -160,7 +165,7 @@ while running:
                 else:
                     game_over = True
 
-        # Wenn Frucht den Boden erreicht, ohne zu treffen → Game Over
+        # Wenn Frucht kein Korb trifft
         if fruit["rect"].bottom > HEIGHT:
             game_over = True
 
